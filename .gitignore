@@ -1,3 +1,5 @@
 .gradle
 build
 **/*.iml
+terraform/.terraform
+terraform/.terraform.lock.hcl
