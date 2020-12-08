@@ -3,3 +3,5 @@ build
 **/*.iml
 terraform/.terraform
 terraform/.terraform.lock.hcl
+scripts/ip-ranges.json
+**/*.zip
