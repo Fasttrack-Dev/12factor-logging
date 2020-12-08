@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+# build the application binary
+echo "Building binary"
+cd ..
+./gradlew build
+
+# package it
+echo "Packaging binary and extensions"
+rm -rf package.zip
+zip -j package.zip build/libs/*.jar
+cd ebs
+zip ../package.zip .ebextensions/*
+
+# upload new version and sync configuration
+echo "Uploading changes to Elastic Beanstalk"
+cd ../terraform
+terraform apply -auto-approve
+app_version=$(terraform output app_version | tr -d '"')
+
+# deploy the lastest version
+echo "Deploying version $app_version"
+aws --region eu-central-1 elasticbeanstalk update-environment \
+  --environment-name "twelve-factor-app-environment" \
+  --version-label "$app_version"
