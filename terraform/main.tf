@@ -38,7 +38,7 @@ resource "aws_elastic_beanstalk_environment" "logging-environment" {
     setting {
         namespace = "aws:elasticbeanstalk:application:environment"
         name = "SPLUNK_SERVER_HOST"
-        value = "splunk.com"
+        value = "18.184.25.89"
     }
     setting {
         namespace = "aws:elasticbeanstalk:application:environment"
