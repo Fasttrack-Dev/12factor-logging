@@ -32,11 +32,16 @@ resource "aws_elastic_beanstalk_environment" "logging-environment" {
     }
 }
 
-data "archive_file" "dist_zip" {
-    type = "zip"
-    source_file = "${path.root}/../build/libs/logging-service-0.0.1-SNAPSHOT.jar"
-    output_path = "${path.root}/logging-service.zip"
-}
+//data "archive_file" "dist_zip" {
+//    type = "zip"
+//    output_path = "${path.root}/logging-service.zip"
+//    source {
+//        filename = "${path.root}/../build/libs/logging-service-0.0.1-SNAPSHOT.jar"
+//    }
+//    source {
+//        filename = "${path.root}/../ebs/.ebextensions"
+//    }
+//}
 
 resource "aws_s3_bucket" "dist_bucket" {
     bucket = "logging-service-staging"
@@ -46,15 +51,15 @@ resource "aws_s3_bucket" "dist_bucket" {
 resource "aws_s3_bucket_object" "dist_item" {
     key = "dist-${uuid()}"
     bucket = aws_s3_bucket.dist_bucket.id
-    source = "${path.root}/logging-service.zip"
+    source = "${path.root}/../package.zip"
 }
 
 resource "aws_elastic_beanstalk_application_version" "default" {
     name        = "logging-service-${uuid()}"
     application = aws_elastic_beanstalk_application.logging-service.name
     description = "application version created by terraform"
-    bucket      = "${aws_s3_bucket.dist_bucket.id}"
-    key         = "${aws_s3_bucket_object.dist_item.id}"
+    bucket      = aws_s3_bucket.dist_bucket.id
+    key         = aws_s3_bucket_object.dist_item.id
 }
 
 output "app_version" {
