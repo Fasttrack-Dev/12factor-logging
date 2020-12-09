@@ -30,18 +30,22 @@ resource "aws_elastic_beanstalk_environment" "logging-environment" {
         name = "SERVER_PORT"
         value = "5000"
     }
+    setting {
+        namespace = "aws:elasticbeanstalk:application:environment"
+        name = "SPLUNK_FORWARDER_RPM_DOWNLOAD_URL"
+        value = "https://download.splunk.com/products/splunk/releases/6.2.2/universalforwarder/linux/splunkforwarder-6.2.2-255606-linux-2.6-x86_64.rpm"
+    }
+    setting {
+        namespace = "aws:elasticbeanstalk:application:environment"
+        name = "SPLUNK_SERVER_HOST"
+        value = "splunk.com"
+    }
+    setting {
+        namespace = "aws:elasticbeanstalk:application:environment"
+        name = "ENVIRONMENT_NAME"
+        value = "logging-environment"
+    }
 }
-
-//data "archive_file" "dist_zip" {
-//    type = "zip"
-//    output_path = "${path.root}/logging-service.zip"
-//    source {
-//        filename = "${path.root}/../build/libs/logging-service-0.0.1-SNAPSHOT.jar"
-//    }
-//    source {
-//        filename = "${path.root}/../ebs/.ebextensions"
-//    }
-//}
 
 resource "aws_s3_bucket" "dist_bucket" {
     bucket = "logging-service-staging"
