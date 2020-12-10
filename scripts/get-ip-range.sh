@@ -1,4 +1,3 @@
 #!/usr/bin/env bash
-
-wget https://ip-ranges.amazonaws.com/ip-ranges.json
-jq '(.prefixes[] | select((.region=="eu-central-1") and (.service=="EC2_INSTANCE_CONNECT"))).ip_prefix' < ip-ranges.json
+echo "Retrieving CIDR range for EC2 instance connect"
+wget -O - https://ip-ranges.amazonaws.com/ip-ranges.json | jq '(.prefixes[] | select((.region=="eu-central-1") and (.service=="EC2_INSTANCE_CONNECT"))).ip_prefix'
