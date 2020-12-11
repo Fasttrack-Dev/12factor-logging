@@ -6,7 +6,15 @@ provider "aws" {
 
 resource "aws_elastic_beanstalk_application" "logging-service" {
     name = "logging-service"
-    description = "Simple REST service to showcase loggin"
+    description = "Simple REST service to showcase logging to Splunk"
+}
+
+data "aws_ssm_parameter" "splunk_host" {
+    name = "/dev/12factor/logging-service/splunk-host"
+}
+
+data "aws_ssm_parameter" "splunk_forwarder_download" {
+    name = "/dev/12factor/logging-service/splunk-forwarder-download"
 }
 
 resource "aws_elastic_beanstalk_environment" "logging-environment" {
@@ -33,12 +41,12 @@ resource "aws_elastic_beanstalk_environment" "logging-environment" {
     setting {
         namespace = "aws:elasticbeanstalk:application:environment"
         name = "SPLUNK_FORWARDER_RPM_DOWNLOAD_URL"
-        value = "https://download.splunk.com/products/splunk/releases/6.2.2/universalforwarder/linux/splunkforwarder-6.2.2-255606-linux-2.6-x86_64.rpm"
+        value = data.aws_ssm_parameter.splunk_forwarder_download.value
     }
     setting {
         namespace = "aws:elasticbeanstalk:application:environment"
         name = "SPLUNK_SERVER_HOST"
-        value = "18.192.51.122"
+        value = data.aws_ssm_parameter.splunk_host.value
     }
     setting {
         namespace = "aws:elasticbeanstalk:application:environment"

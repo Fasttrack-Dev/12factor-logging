@@ -10,18 +10,16 @@ echo "Packaging binary and extensions"
 rm -rf package.zip
 zip -j package.zip build/libs/*.jar
 cd ebs
-# skip ebextensions for now
 zip ../package.zip .ebextensions/*
 
 # upload new version and sync configuration
 echo "Uploading changes to Elastic Beanstalk"
 cd ../terraform
-terraform apply
+terraform apply -auto-approve
 version_with_quotes=$(terraform output app_version)
 # cut quotes
 app_version="${version_with_quotes%\"}"
 app_version="${app_version#\"}"
-echo "Created application version $app_version"
 
 # deploy the lastest version
 echo "Deploying version $app_version"
