@@ -4,6 +4,15 @@ provider "aws" {
         652129918095]
 }
 
+terraform {
+    backend "s3" {
+        bucket = "12factor-terraform-state"
+        key    = "terraform.tfstate"
+        region = "eu-central-1"
+        dynamodb_table = "12factor-terraform-lock"
+    }
+}
+
 resource "aws_elastic_beanstalk_application" "logging-service" {
     name = "logging-service"
     description = "Simple REST service to showcase logging to Splunk"
