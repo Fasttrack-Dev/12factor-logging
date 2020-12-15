@@ -17,6 +17,10 @@ data "aws_ssm_parameter" "splunk_forwarder_download" {
     name = "/dev/12factor/logging-service/splunk-forwarder-download"
 }
 
+data "aws_ssm_parameter" "newrelic_license_key" {
+    name = "/dev/12factor/logging-service/newrelic-license-key"
+}
+
 resource "aws_elastic_beanstalk_environment" "logging-environment" {
     name = "logging-environment"
     application = aws_elastic_beanstalk_application.logging-service.name
@@ -52,6 +56,11 @@ resource "aws_elastic_beanstalk_environment" "logging-environment" {
         namespace = "aws:elasticbeanstalk:application:environment"
         name = "ENVIRONMENT_NAME"
         value = "logging-environment"
+    }
+    setting {
+        namespace = "aws:elasticbeanstalk:application:environment"
+        name = "NEWRELIC_LICENSE_KEY"
+        value = data.aws_ssm_parameter.newrelic_license_key.value
     }
 }
 
