@@ -7,7 +7,7 @@ provider "aws" {
 terraform {
     backend "s3" {
         bucket = "12factor-terraform-state"
-        key    = "terraform.tfstate"
+        key = "terraform.tfstate"
         region = "eu-central-1"
         dynamodb_table = "12factor-terraform-lock"
     }
@@ -33,7 +33,7 @@ data "aws_ssm_parameter" "newrelic_license_key" {
 resource "aws_elastic_beanstalk_environment" "logging-environment" {
     name = "logging-environment"
     application = aws_elastic_beanstalk_application.logging-service.name
-    solution_stack_name = "64bit Amazon Linux 2 v3.1.3 running Corretto 8"
+    solution_stack_name = "64bit Amazon Linux 2 v3.1.4 running Corretto 8"
 
     # https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/command-options-general.html
     setting {
@@ -71,6 +71,28 @@ resource "aws_elastic_beanstalk_environment" "logging-environment" {
         name = "NEWRELIC_LICENSE_KEY"
         value = data.aws_ssm_parameter.newrelic_license_key.value
     }
+
+    # https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/health-enhanced-cloudwatch.html
+    # 60 indicates the number of seconds between measurements. Currently, this is the only supported value.
+    setting {
+        namespace = "aws:elasticbeanstalk:healthreporting:system"
+        name = "ConfigDocument"
+        value = <<EOF
+{
+    "CloudWatchMetrics": {
+      "Environment": {
+        "ApplicationRequests2xx": 60,
+        "ApplicationRequests5xx": 60,
+        "ApplicationRequests4xx": 60
+      },
+      "Instance": {
+        "ApplicationRequestsTotal": 60
+      }
+    },
+    "Version": 1
+}
+EOF
+    }
 }
 
 resource "aws_s3_bucket" "dist_bucket" {
@@ -85,11 +107,11 @@ resource "aws_s3_bucket_object" "dist_item" {
 }
 
 resource "aws_elastic_beanstalk_application_version" "default" {
-    name        = "logging-service-${uuid()}"
+    name = "logging-service-${uuid()}"
     application = aws_elastic_beanstalk_application.logging-service.name
     description = "application version created by terraform"
-    bucket      = aws_s3_bucket.dist_bucket.id
-    key         = aws_s3_bucket_object.dist_item.id
+    bucket = aws_s3_bucket.dist_bucket.id
+    key = aws_s3_bucket_object.dist_item.id
 }
 
 output "app_version" {
