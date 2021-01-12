@@ -16,13 +16,10 @@ zip ../package.zip .ebextensions/*
 echo "Uploading changes to Elastic Beanstalk"
 cd ../terraform
 terraform apply -auto-approve
-version_with_quotes=$(terraform output app_version)
-# cut quotes
-app_version="${version_with_quotes%\"}"
-app_version="${app_version#\"}"
+app_version=$(terraform output app_version | tr -d '"')
 
 # deploy the lastest version
 echo "Deploying version $app_version"
 aws --region eu-central-1 elasticbeanstalk update-environment \
-  --environment-name "logging-environment" \
+  --environment-name "twelve-factor-app-environment" \
   --version-label "$app_version"
