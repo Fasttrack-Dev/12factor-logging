@@ -26,7 +26,7 @@ Resource actions are indicated with the following symbols:
 cd scripts
 ./pipeline
 ```
-## Use your environment
+## Use your environment with eb cli (optional)
 
 ```sh
 bash$ eb init -r eu-central-1
