@@ -14,7 +14,7 @@ terraform {
 }
 
 resource "aws_elastic_beanstalk_application" "twelve-factor-app-service" {
-  name        = "logging-service-ns-ac"
+  name        = "logging-service"
   description = "Simple REST service to showcase logging to Splunk"
 }
 
