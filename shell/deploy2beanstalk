@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+account=$(aws sts get-caller-identity --query "Account" --output text)
+bucket_name="twelve-factor-app-service-staging-$account"
+package_name="$1"
+BUILD_VERSION="$2"
+stack_name="twelve-factor-logging-stack"
+aws_region=$(aws configure get region)
+
+echo "Staging to $bucket_name in region $aws_region"
+./shell/prepare-bucket "$bucket_name" "$aws_region"
+aws s3 cp "$package_name" "s3://$bucket_name"
+
+# spin up / refresh environment
+aws cloudformation deploy \
+  --capabilities CAPABILITY_IAM \
+  --stack-name $stack_name \
+  --template-file cloudformation/logging-stack.yml \
+  --parameter-overrides \
+      PackageName="$package_name" \
+      BucketName="$bucket_name" \
+      BuildVersion="$BUILD_VERSION"
+
+# create application version
+aws elasticbeanstalk create-application-version \
+  --application-name 12factor-logging \
+  --version-label "$BUILD_VERSION" \
+  --description "Application version $BUILD_VERSION" \
+  --source-bundle S3Bucket="$bucket_name",S3Key="$package_name"
+
+# deploy it
+aws elasticbeanstalk update-environment \
+  --environment-name 12factor-logging \
+  --version-label "$BUILD_VERSION"

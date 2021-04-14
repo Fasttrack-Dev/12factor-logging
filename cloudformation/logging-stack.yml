@@ -1,0 +1,61 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Parameters:
+  PackageName:
+    Type: String
+  BucketName:
+    Type: String
+  BuildVersion:
+    Type: String
+
+
+Resources:
+
+  InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - "aws-elasticbeanstalk-ec2-role"
+
+  TwelveFactorApplication:
+    Type: AWS::ElasticBeanstalk::Application
+    Properties:
+      ApplicationName: 12factor-logging
+      Description: Demo application for integrating GitLab and AWS
+
+  TwelveFactorEnvironment:
+    Type: AWS::ElasticBeanstalk::Environment
+    Properties:
+      ApplicationName: !Ref TwelveFactorApplication
+      Description: Development environment
+      EnvironmentName: 12factor-logging
+      OptionSettings:
+        - Namespace: 'aws:autoscaling:launchconfiguration'
+          OptionName: IamInstanceProfile
+          Value: !Ref InstanceProfile
+        - Namespace: 'aws:autoscaling:launchconfiguration'
+          OptionName: InstanceType
+          Value: "t3.micro"
+        - Namespace: "aws:elasticbeanstalk:application:environment"
+          OptionName: "SERVER_PORT"
+          Value: "5000"
+        - Namespace: "aws:elasticbeanstalk:application"
+          OptionName: "Application Healthcheck URL"
+          Value: "/actuator/health"
+        - Namespace: "aws:elasticbeanstalk:healthreporting:system"
+          OptionName: "ConfigDocument"
+          Value: |
+            {
+              "CloudWatchMetrics": {
+                "Environment": {
+                  "ApplicationRequests2xx": 60,
+                  "ApplicationRequests5xx": 60,
+                  "ApplicationRequests4xx": 60
+                },
+                "Instance": {
+                  "ApplicationRequestsTotal": 60
+                }
+              },
+              "Version": 1
+            }
+      SolutionStackName: "64bit Amazon Linux 2 v3.1.4 running Corretto 8"

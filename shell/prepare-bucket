@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+# args (bucket-name, region)
+function prepareBucket {
+  echo "Creating staging bucket if necessary"
+  if [ -z "$(aws s3api head-bucket --bucket "$1" 2>&1)" ]
+  then
+    echo "bucket exists, verifying region..."
+    bucket_region=$(aws s3api get-bucket-location --bucket "$1" | jq .LocationConstraint | tr -d '"')
+    if [ "$bucket_region" != "$2" ]
+    then
+      echo "Error: The staging bucket '$1' already exists in region $bucket_region"
+      exit 1
+    fi
+  else
+    echo "Info: The staging bucket does not yet exist and will be created in your configured region $aws_region"
+    aws s3api create-bucket --bucket "$1" --region "$2" --create-bucket-configuration LocationConstraint="$2"
+  fi
+}
+
+prepareBucket "$1" "$2"

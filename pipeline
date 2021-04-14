@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+BUILD_VERSION=$(uuidgen)
+package_name="12factor-logging-$BUILD_VERSION.zip"
+
+# build the application binary
+echo "Building binary"
+echo "Using $BUILD_VERSION as build version"
+./gradlew build
+
+# package it
+echo "Packaging binary and extensions"
+zip -j "$package_name" build/libs/*.jar
+
+# stage it
+echo "Uploading application source bundle"
+./shell/deploy2beanstalk "$package_name" "$BUILD_VERSION"
+
+# remove temps
+rm -rf "$package_name"

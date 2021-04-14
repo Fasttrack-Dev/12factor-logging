@@ -3,7 +3,7 @@ build
 **/*.iml
 terraform/.terraform
 terraform/.terraform.lock.hcl
-scripts/ip-ranges.json
+shell/ip-ranges.json
 **/*.zip
 
 # Elastic Beanstalk Files
