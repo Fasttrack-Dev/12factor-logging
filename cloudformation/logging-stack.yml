@@ -61,4 +61,7 @@ Resources:
         - Namespace: "aws:elasticbeanstalk:application:environment"
           OptionName: "NEWRELIC_LICENSE_KEY"
           Value: "{{resolve:ssm:/dev/12factor/logging-service/newrelic-license-key}}"
+        - Namespace: "aws:elasticbeanstalk:application:environment"
+          OptionName: "HEC_TOKEN"
+          Value: "{{resolve:ssm:/dev/12factor/logging-service/hec-token}}"
       SolutionStackName: "64bit Amazon Linux 2 v3.1.4 running Corretto 8"

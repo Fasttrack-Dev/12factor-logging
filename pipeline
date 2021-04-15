@@ -11,6 +11,9 @@ echo "Using $BUILD_VERSION as build version"
 # package it
 echo "Packaging binary and extensions"
 zip -j "$package_name" build/libs/*.jar
+cd ebs
+zip "../$package_name" .ebextensions/*
+cd ..
 
 # stage it
 echo "Uploading application source bundle"
