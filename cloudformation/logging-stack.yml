@@ -64,4 +64,4 @@ Resources:
         - Namespace: "aws:elasticbeanstalk:application:environment"
           OptionName: "HEC_TOKEN"
           Value: "{{resolve:ssm:/dev/12factor/logging-service/hec-token}}"
-      SolutionStackName: "64bit Amazon Linux 2 v3.1.4 running Corretto 8"
+      SolutionStackName: "64bit Amazon Linux 2 v3.1.7 running Corretto 8"
